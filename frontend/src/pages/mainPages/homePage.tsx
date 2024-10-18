@@ -3,7 +3,7 @@ import characterImg from '../../assets/images/characters.webp';
 import monstersImg from '../../assets/images/monsters.jpg';
 import hammerImg from '../../assets/images/hammer.png';
 import dragonGif from '../../assets/images/dragon.gif';
-import favoriteImg from '../../assets/images/favorite.png';
+import favoriteImg from '../../assets/images/unfavorite.png';
 import Tilt from 'react-parallax-tilt';
 import HomeSection from '../../components/Home/HomeSection.tsx';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -30,14 +30,14 @@ export default function HomePage() {
 
   const dragon1X = useTransform(
     scrollYProgress,
-    isMobile ? [0.35, 0.6] : [0.35, 0.65],
-    isMobile ? ['-300%', '300%'] : ['-600%', '600%'],
+    isMobile ? [0.35, 0.7] : [0.35, 0.65],
+    isMobile ? ['-300%', '300%'] : ['-800%', '800%'],
   );
 
   const dragon2X = useTransform(
     scrollYProgress,
-    isMobile ? [0.65, 0.9] : [0.7, 1.0],
-    isMobile ? ['300%', '-300%'] : ['600%', '-600%'],
+    isMobile ? [0.65, 1] : [0.7, 1.0],
+    isMobile ? ['300%', '-300%'] : ['800%', '-800%'],
   );
 
   return (

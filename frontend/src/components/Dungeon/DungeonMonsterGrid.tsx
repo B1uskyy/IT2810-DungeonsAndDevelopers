@@ -1,5 +1,5 @@
 import { hourglass } from 'ldrs';
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { DungeonContext } from '../../context/DungeonContext.tsx';
 import MonsterCard from '../MonsterCard/MonsterCard.tsx';
 
@@ -7,35 +7,38 @@ const DungeonMonsterGrid = () => {
   const { dungeonMonsters } = useContext(DungeonContext);
   const [loadedMonsters, setLoadedMonsters] = useState<number>(0);
 
-  hourglass.register();
-  const isLoading = loadedMonsters < dungeonMonsters.length;
+  // Register the hourglass if necessary
+  useEffect(() => {
+    hourglass.register();
+  }, []);
+
+  const totalMonsters = dungeonMonsters.length;
+  const isLoading = loadedMonsters < totalMonsters;
 
   const handleMonsterLoad = () => {
     setLoadedMonsters((prevCount) => prevCount + 1);
   };
 
   return (
-    <section aria-label="Monster List" className="flex flex-col items-center">
-      <h2 className="sr-only">Monsters in this dungeon</h2>
+    <div className="relative flex-grow w-full overflow-y-auto">
+      {/* Hourglass overlay during loading */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <l-hourglass size="70" bg-opacity="0.1" speed="1.75" color="white"></l-hourglass>
+        </div>
+      )}
+
+      {/* MonsterCards rendered but hidden until loading completes */}
       <div
-        className="flex flex-col items-center justify-center h-full"
-        style={{ display: isLoading ? 'block' : 'none' }}
+        className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10 place-items-center transition-opacity duration-500 ${
+          isLoading ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}
       >
-        <l-hourglass size="70" bg-opacity="0.1" speed="1.75" color="white"></l-hourglass>
+        {dungeonMonsters.map((monster, idx) => (
+          <MonsterCard key={idx} {...monster} onLoad={handleMonsterLoad} />
+        ))}
       </div>
-      <div
-        className="bg-customGray bg-opacity-80 p-8 rounded-lg shadow-lg w-2/3 tablet:w-10/12 h-auto flex flex-col items-center justify-center mt-10 mb-10"
-        style={{ display: isLoading ? 'none' : 'block' }}
-      >
-        <ul className="flex-grow gap-10 w-full grid grid-cols-3 max-laptop:grid-cols-2 max-mobile:grid-cols-1 list-none gap-6">
-          {dungeonMonsters.map((monster) => (
-            <li key={monster.index}>
-              <MonsterCard {...monster} onLoad={handleMonsterLoad} />
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+    </div>
   );
 };
 

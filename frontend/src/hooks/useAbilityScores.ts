@@ -1,18 +1,27 @@
 import { useEffect, useState } from 'react';
 
+// Define the structure for a skill
+interface Skill {
+  name: string;
+  index: string;
+  url: string;
+}
+
+// Define the structure for the ability score data
+interface AbilityScoreData {
+  name: string;
+  full_name: string;
+  desc: string;
+  skills: Skill[];
+}
+
 function useAbilityScores(abilityScoreName: string) {
-  const [data, setData] = useState<{
-    name: string;
-    full_name: string;
-    desc: string;
-    skills: string[];
-  }>({
+  const [data, setData] = useState<AbilityScoreData>({
     name: '',
     full_name: '',
     desc: '',
     skills: [],
   });
-
 
   useEffect(() => {
     fetch('https://www.dnd5eapi.co/api/ability-scores/' + abilityScoreName)
@@ -21,12 +30,7 @@ function useAbilityScores(abilityScoreName: string) {
       .catch((error) => console.log(error));
   }, [abilityScoreName]);
 
-  return {
-    name: data.name,
-    full_name: data.full_name,
-    desc: data.desc,
-    skills: data.skills,
-  };
+  return data;
 }
 
 export default useAbilityScores;

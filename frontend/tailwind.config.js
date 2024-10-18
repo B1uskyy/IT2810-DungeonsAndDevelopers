@@ -21,10 +21,10 @@ export default {
       },
       backgroundImage: {
         login: 'url(\'/src/assets/images/background/login_bg.jpeg\')',
-        dungeon: 'url(\'/src/assets/images/background/dungeon_bg.jpeg\')',
+        dungeon: 'url(\'/src/assets/images/background/dungeon_bg.png\')',
         equipments: 'url(\'/src/assets/images/background/equipment_bg.jpeg\')',
         myCharacter: 'url(\'/src/assets/images/background/my_character_bg.jpg\')',
-        monsters: 'url(\'/src/assets/images/background/monsters_bg.jpeg\')',
+        monsters: 'url(\'/src/assets/images/background/monsters_bg.png\')',
         home: 'url(\'/src/assets/images/background/home_bg.jpeg\')',
         subPage: 'url(\'/src/assets/images/background/sub_page_bg3.png\')',
       },

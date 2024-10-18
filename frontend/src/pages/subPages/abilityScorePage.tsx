@@ -14,7 +14,7 @@ export default function AbilityScorePage() {
             key={index}
             name={ability.full_name}
             description={ability.desc}
-            skills={ability.skills.map(skill => ({ name: typeof skill === 'string' ? skill : skill.name }))}
+            skills={ability.skills.map((skill) => ({ name: skill.name }))}
           />
         ))}
       </section>

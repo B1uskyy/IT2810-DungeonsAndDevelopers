@@ -71,6 +71,7 @@ const MainPageLayout: React.FC<MainPageLayoutProps> = ({ children, isLoginTransi
       }}
       style={{ WebkitClipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', willChange: 'clip-path, opacity' }}
     >
+      
       {children}
     </motion.div>
   );

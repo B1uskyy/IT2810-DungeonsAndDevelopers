@@ -5,7 +5,6 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
   Slider,
   TextField,
 } from '@mui/material';
@@ -68,7 +67,19 @@ const MonsterReviewModal = ({ name, monsterIndex, image }: ReviewType) => {
 
   return (
     <>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      <Button variant="outlined" onClick={handleClickOpen}
+              sx={{
+                color: 'white',
+                borderColor: 'white',
+                '&:hover': {
+                  borderColor: '#DB3232',
+                  color: '#DB3232',
+                },
+                fontFamily: 'MedievalSharp',
+                fontSize: '15px',
+                textTransform: 'none',
+                padding: '3px',
+              }}>
         Review
       </Button>
       <Dialog
@@ -79,17 +90,17 @@ const MonsterReviewModal = ({ name, monsterIndex, image }: ReviewType) => {
           onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             localStorage.setItem(
-              `Review: ${monsterIndex}`,
+              name,
               JSON.stringify({
                 difficulty: difficulty,
                 description: description,
-              })
+              }),
             );
             handleClose();
           },
           sx: {
-            width: '100vw',
-            height: '93vh',
+            width: '90vw',
+            height: '80vh',
             maxWidth: 'none',
             padding: 4,
             backgroundColor: 'black',
@@ -97,11 +108,18 @@ const MonsterReviewModal = ({ name, monsterIndex, image }: ReviewType) => {
         }}
       >
         <DialogContent className="flex flex-row items-center bg-black gap-6">
-          <Box sx={{ width: '50%' }}>
-            <img src={image} alt="Image of selected monster" />
+          <Box sx={{
+            width: '50%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '50px',
+          }}>
+            <img src={image} alt="Image of selected monster" className="w-1/2 rounded" />
+            <h2 className="text-white text-3xl">{name}</h2>
           </Box>
           <article className="flex flex-col gap-4 w-1/2">
-            <DialogTitle className="text-4xl">{name}</DialogTitle>
             <DialogContentText sx={{ color: 'white', fontSize: '24px', fontFamily: 'MedievalSharp' }}>
               Difficulty
             </DialogContentText>
@@ -124,14 +142,26 @@ const MonsterReviewModal = ({ name, monsterIndex, image }: ReviewType) => {
                     fontFamily: 'MedievalSharp',
                     fontSize: '1.5rem',
                   },
+
+                  '& .MuiSlider-mark': {
+                    color: 'white',
+                    width: 5,
+                    height: 5,
+                    borderRadius: '50%',
+                    transform: 'translateX(-50%) translateY(-50%)',
+                  },
+
                   '& .MuiSlider-thumb': {
+                    color: '#DB3232',
                     width: 24,
                     height: 24,
                   },
                   '& .MuiSlider-track': {
+                    color: '#DB3232',
                     height: 10,
                   },
                   '& .MuiSlider-rail': {
+                    color: '#DB3232',
                     height: 10,
                   },
                 }}
@@ -149,6 +179,7 @@ const MonsterReviewModal = ({ name, monsterIndex, image }: ReviewType) => {
               variant="standard"
               multiline
               minRows={4}
+              maxRows={12}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               sx={{
@@ -157,30 +188,57 @@ const MonsterReviewModal = ({ name, monsterIndex, image }: ReviewType) => {
                   fontSize: '20px',
                   height: 'auto',
                   padding: '16px',
+                  fontFamily: 'MedievalSharp',
                 },
                 '& .MuiInputLabel-root': {
                   color: 'white',
                   fontFamily: 'MedievalSharp',
                   fontSize: '24px',
                 },
+
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: 'white',
+                },
+
                 '& .MuiInput-underline:before': {
                   borderBottomColor: 'white',
                 },
                 '& .MuiInput-underline:after': {
-                  borderBottomColor: 'yellow',
+                  borderBottomColor: '#DB3232',
                 },
-                width: '500px',
+                '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+                  borderBottomColor: '#DB3232',
+                },
+
               }}
             ></TextField>
           </article>
         </DialogContent>
 
         <DialogActions className="bg-black">
-          <Button onClick={handleClose} aria-label="Cancel">
+          <Button onClick={handleClose} aria-label="Cancel-button" sx={{
+            color: 'white',
+            borderColor: 'white',
+            '&:hover': {
+              borderColor: '#DB3232',
+              color: '#DB3232',
+            },
+            fontFamily: 'MedievalSharp',
+            fontSize: '1.5rem',
+          }}>
             Cancel
           </Button>
-          <Button type="submit" aria-label="Save">
-            Save
+          <Button type="submit" aria-label="Save-button" sx={{
+            color: 'white',
+            borderColor: 'white',
+            '&:hover': {
+              borderColor: '#DB3232',
+              color: '#DB3232',
+            },
+            fontFamily: 'MedievalSharp',
+            fontSize: '1.5rem',
+          }}>
+            SUBMIT
           </Button>
         </DialogActions>
       </Dialog>

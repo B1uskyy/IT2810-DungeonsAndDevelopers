@@ -77,28 +77,28 @@ const mapToCard = (data: Monster): MonsterCardDataProps => {
  * @param {boolean} [fullDetails=false] - Whether to fetch full details or just card data.
  * @returns {UseQueryResult<Monster | MonsterCardDataProps, Error>[]} - An array of query results.
  */
-function useMonsters(
+function useMonster(
   monsterIndexes: string[],
   searchTerm: string,
   currentPage: number,
   monstersPerPage: number,
-  fullDetails: boolean = false
+  fullDetails: boolean = false,
 ): UseQueryResult<Monster | MonsterCardDataProps, Error>[] {
   const filteredMonsters = useMemo(
-    () => searchTerm === '' 
-      ? monsterIndexes 
-      : monsterIndexes.filter((monsterIndex) => 
-          monsterIndex.toLowerCase().includes(searchTerm.toLowerCase().replace(/\s+/g, '-'))
-        ),
-    [monsterIndexes, searchTerm]
+    () => searchTerm === ''
+      ? monsterIndexes
+      : monsterIndexes.filter((monsterIndex) =>
+        monsterIndex.toLowerCase().includes(searchTerm.toLowerCase().replace(/\s+/g, '-')),
+      ),
+    [monsterIndexes, searchTerm],
   );
 
   const paginatedMonsters = useMemo(
     () => filteredMonsters.slice(
       (currentPage - 1) * monstersPerPage,
-      currentPage * monstersPerPage
+      currentPage * monstersPerPage,
     ),
-    [filteredMonsters, currentPage, monstersPerPage]
+    [filteredMonsters, currentPage, monstersPerPage],
   );
 
   const queries = paginatedMonsters.map((index) => ({
@@ -112,4 +112,4 @@ function useMonsters(
   return useQueries({ queries });
 }
 
-export default useMonsters;
+export default useMonster;

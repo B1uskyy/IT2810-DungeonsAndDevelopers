@@ -2,7 +2,6 @@ import { useContext, useState } from 'react';
 import CustomInput from '../../components/CustomInput/CustomInput.tsx';
 import DungeonMonsterGrid from '../../components/Dungeon/DungeonMonsterGrid.tsx';
 import DungeonStats from '../../components/Dungeon/DungeonStats.tsx';
-import '../../components/MonsterCard/MonsterCard.css';
 import { DungeonContext } from '../../context/DungeonContext.tsx';
 import MainPageLayout from '../../components/Layouts/MainPageLayout.tsx';
 
@@ -21,25 +20,22 @@ export default function DungeonPage() {
 
   return (
     <MainPageLayout>
-      <section className="min-h-screen flex flex-col bg-storm_giant bg-cover bg-center bg-no-repeat relative">
-        <main className="flex-grow flex flex-col items-center justify-center relative z-10 ">
-          <article className="flex flex-col gap-16 items-center w-full max-w-7xl mx-auto">
-            <section className="bg-customGray bg-opacity-80 p-8 rounded-lg shadow-lg w-2/3 tablet:w-10/12">
-              <CustomInput
-                placeholder="Enter dungeon name"
-                inputName="Dungeon Name"
-                value={dungeonName}
-                onSave={handleSaveDungeonName}
-              />
-              <section className="flex flex-col items-center">
-                <DungeonStats monsters={dungeonMonsters} />
-              </section>
+      <main
+        className="relative flex flex-col items-center justify-center min-h-screen w-full z-0 before:absolute before:inset-0 before:bg-dungeon before:bg-cover before:bg-center before:z-0">
+        <div className="absolute inset-0 w-full h-full bg-black opacity-70" />
+        <div
+          className="flex flex-col py-20 text-white min-h-[calc(100vh-100px)] min-w-[70%] z-10 mt-20 justify-between items-center">
+          <CustomInput
+            placeholder="Enter dungeon name"
+            inputName="Dungeon Name"
+            value={dungeonName}
+            onSave={handleSaveDungeonName}
+          />
+          <DungeonStats monsters={dungeonMonsters} />
 
-              <DungeonMonsterGrid />
-            </section>
-          </article>
-        </main>
-      </section>
+          <DungeonMonsterGrid />
+        </div>
+      </main>
     </MainPageLayout>
   );
 }

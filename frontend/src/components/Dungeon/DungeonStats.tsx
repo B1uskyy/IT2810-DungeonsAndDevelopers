@@ -1,4 +1,4 @@
-import { MonsterCardDataProps } from "../../hooks/useMonster";
+import { MonsterCardDataProps } from '../../hooks/useMonster';
 
 
 type Stats = {
@@ -14,21 +14,23 @@ const DungeonStats = ({ monsters }: Stats) => {
       counts[alignment] = (counts[alignment] || 0) + 1;
       return counts;
     },
-    {} as Record<string, number>
+    {} as Record<string, number>,
   );
 
   return (
-    <aside className="flex flex-col items-center text-center">
-      <h3 className="text-2xl">Dungeon Stats</h3>
-      <p>{`Total hp for monsters: ${totalHp}`}</p>
-      <h4>Aligment distribution</h4>
-      <ul className="list-disc ml-6">
-        {Object.entries(alignmentCounts).map(([alignment, count]) => (
-          <li key={alignment}>
-            {alignment}: {count}
-          </li>
-        ))}
-      </ul>
+    <aside className="flex gap-20 justify-between">
+      <h2 className="text-2xl">{`Total HP: ${totalHp}`}</h2>
+      {/*
+      <div className="flex flex-col">
+        <h3 className="text-xl">Aligment distribution:</h3>
+        <ul className="list-disc ml-6">
+          {Object.entries(alignmentCounts).map(([alignment, count]) => (
+            <li key={alignment}>
+              {alignment}: {count}
+            </li>
+          ))}
+        </ul>
+      </div>*/}
     </aside>
   );
 };
