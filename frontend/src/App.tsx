@@ -1,13 +1,12 @@
-
-import './App.css'
+import { BrowserRouter } from 'react-router-dom';
+import AnimatedRoutes from './components/AnimatedRoutes/AnimatedRoutes.tsx';
 
 function App() {
-
   return (
-    <>
-      <h1 className="text-6xl">Hello world!</h1>
-     </>
-  )
+    <BrowserRouter>
+      <AnimatedRoutes />
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

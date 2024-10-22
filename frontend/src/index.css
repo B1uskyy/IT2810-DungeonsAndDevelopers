@@ -1,3 +1,59 @@
+/* Import Google Font for regular weight */
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+
+/* Local Bold font */
+@font-face {
+    font-family: 'MedievalSharpLocal';
+    src: url('./assets/fonts/MedievalSharp-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* Local Italic font */
+@font-face {
+    font-family: 'MedievalSharpLocal';
+    src: url('./assets/fonts/MedievalSharp-BookOblique.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+/* Local Bold Italic font */
+@font-face {
+    font-family: 'MedievalSharpLocal';
+    src: url('./assets/fonts/MedievalSharp-BoldOblique.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    font-family: "MedievalSharp", "sans-serif";
+    color: white;
+    background-color: #000000;
+    overflow-x: hidden;
+}
+
+.bold {
+    font-family: "MedievalSharpLocal", "sans-serif";
+    font-weight: bold;
+}
+
+.italic {
+    font-family: "MedievalSharpLocal", "sans-serif";
+    font-style: italic;
+}
+
+.bold-italic {
+    font-family: "MedievalSharpLocal", "sans-serif";
+    font-weight: bold;
+    font-style: italic;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
