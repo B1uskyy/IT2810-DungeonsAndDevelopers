@@ -1,16 +1,46 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { motion } from 'framer-motion';
+import CustomCheckbox from '../CustomCheckbox/CustomCheckbox.tsx';
+import { UPDATE_USER_RACE } from '../../../../backend/src/graphql/queries.ts';
+import { AuthContext } from '../../context/AuthContext';
+import { useMutation } from '@apollo/client';
+import RaceProps from '../../interfaces/RaceProps.ts';
+import { useToast } from '../../hooks/useToast.ts';
+import raceImageMapping from '../../utils/raceImageMapping.ts';
 
-interface RaceCardProps {
-  name: string;
-  description: string;
-  imageUrl: string;
+interface RaceCardProps extends RaceProps {
+  selectedRaceId: string;
+  onSelect: (id: string) => void;
 }
 
-const RaceCard: React.FC<RaceCardProps> = ({ name, description, imageUrl }) => {
+const RaceCard: React.FC<RaceCardProps> = ({ id, index, name, alignment, size, speed, selectedRaceId, onSelect }) => {
+  const { userId } = useContext(AuthContext);
+  const [updateUserRace] = useMutation(UPDATE_USER_RACE);
+  const { showToast } = useToast();
+  const raceImage = raceImageMapping[index];
+  const handleSelectRace = () => {
+    if (selectedRaceId !== id) {
+      onSelect(id);
+      updateUserRace({
+        variables: { userId, raceId: id },
+      })
+        .then((response) => {
+          showToast({
+            message: `Race changed to ${name}`,
+            type: 'success',
+            duration: 3000,
+          });
+          console.log('Race updated:', response.data.updateUserRace.race);
+        })
+        .catch((error) => {
+          console.error('Error updating race:', error);
+        });
+    }
+  };
+
   return (
     <motion.section
-      className="flex flex-row h-60 w-full justify-between items-center p-12 rounded-lg bg-black bg-opacity-80"
+      className="flex flex-col xl:flex-row xl:h-90 w-full justify-between items-center p-8 xl:p-12 rounded-lg bg-black bg-opacity-90 gap-10"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.1 }}
@@ -20,15 +50,17 @@ const RaceCard: React.FC<RaceCardProps> = ({ name, description, imageUrl }) => {
         visible: { opacity: 1, y: 0 },
       }}
     >
-      <div className="flex items-center gap-5">
-        <img src={imageUrl} alt={name} className="max-w-28 shadow-none" />
+      <div className="flex flex-col xl:flex-row gap-5 justify-center items-center ">
+        <img src={raceImage} alt={name} className="max-w-36 xl:max-w-28 shadow-none" />
         <div>
-          <h2 className="text-3xl">{name}</h2>
-          <p className="text-lg">{description}</p>
+          <h2 className="sub-header bold">{name}</h2>
+          <p className="text">{alignment}</p>
+          <p className="text">Size: {size}</p>
+          <p className="text">Speed: {speed}</p>
         </div>
       </div>
-      <div>
-        <input type="checkbox" className="cursor-pointer w-32 h-12 accent-customRed " />
+      <div className="w-1/5 flex items-center justify-center xl:justify-end">
+        <CustomCheckbox scale={2} checked={selectedRaceId === id} onChange={handleSelectRace} disableUncheck={true} />
       </div>
     </motion.section>
   );

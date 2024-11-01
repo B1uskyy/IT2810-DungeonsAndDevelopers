@@ -9,28 +9,30 @@ interface PaginationProps {
 
 const Pagination: React.FC<PaginationProps> = ({ currentPage, onPageChange, totalPages }) => {
   return (
-    <section className="flex justify-center gap-40 w-full text-xl mt-10">
-      {/* Previous button - disabled when on the first page */}
-      <button
-        className="flex items-center hover:text-gray-400 w-44"
-        onClick={() => onPageChange(-1)}
-        disabled={currentPage === 1}  // Disable if on first page
-      >
-        <FaChevronLeft className="mr-2" />
-        Previous Page
-      </button>
+    <section className="w-full flex justify-center items-center mt-5">
+      <div className="flex justify-between items-center w-[70vw] xl:w-[30vw] w-text-2xl xl:text-lg 2xl:text-md">
+        {/* Previous button - disabled when on the first page */}
+        <button
+          className="flex items-center hover:text-gray-400"
+          onClick={() => onPageChange(-1)}
+          disabled={currentPage === 1}  // Disable if on first page
+        >
+          <FaChevronLeft className="mr-2" />
+          Prev Page
+        </button>
 
-      <span className="w-2 text-center">{currentPage}</span>
+        <span className="w-2">{currentPage}</span>
 
-      {/* Next button - disabled when on the last page */}
-      <button
-        className="flex items-center hover:text-gray-400 w-44"
-        onClick={() => onPageChange(1)}
-        disabled={currentPage === totalPages}  // Disable if on last page
-      >
-        Next Page
-        <FaChevronRight className="ml-2" />
-      </button>
+        {/* Next button - disabled when on the last page */}
+        <button
+          className="flex items-center hover:text-gray-400"
+          onClick={() => onPageChange(1)}
+          disabled={currentPage === totalPages}  // Disable if on last page
+        >
+          Next Page
+          <FaChevronRight className="ml-2" />
+        </button>
+      </div>
     </section>
   );
 };

@@ -10,6 +10,7 @@ import MonsterPage from '../../pages/mainPages/monsterPage.tsx';
 import MyCharacterPage from '../../pages/mainPages/myCharacterPage.tsx';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
+import ProtectedRoute from '../ProtectedRoute/ProtectedRoute.tsx';
 
 export default function AnimatedRoutes() {
   const location = useLocation();
@@ -22,15 +23,74 @@ export default function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/project2" element={<LoginPage />} />
-        <Route path="/project2/home" element={<HomePage />} />
-        <Route path="/project2/dungeon" element={<DungeonPage />} />
-        <Route path="/project2/class" element={<ClassPage />} />
-        <Route path="/project2/race" element={<RacePage />} />
-        <Route path="/project2/abilityscore" element={<AbilityScorePage />} />
-        <Route path="/project2/equipment" element={<EquipmentPage />} />
-        <Route path="/project2/monsters" element={<MonsterPage />} />
-        <Route path="/project2/mycharacter" element={<MyCharacterPage />} />
+        {/* Public Route */}
+        <Route path="" element={<LoginPage />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dungeon"
+          element={
+            <ProtectedRoute>
+              <DungeonPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/class"
+          element={
+            <ProtectedRoute>
+              <ClassPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/race"
+          element={
+            <ProtectedRoute>
+              <RacePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/abilityscore"
+          element={
+            <ProtectedRoute>
+              <AbilityScorePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/equipment"
+          element={
+            <ProtectedRoute>
+              <EquipmentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/monsters"
+          element={
+            <ProtectedRoute>
+              <MonsterPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mycharacter"
+          element={
+            <ProtectedRoute>
+              <MyCharacterPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );

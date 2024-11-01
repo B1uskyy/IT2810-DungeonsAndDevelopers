@@ -1,44 +1,41 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@apollo/client';
+import { useMemo } from 'react';
+import RaceProps from '../interfaces/RaceProps.ts';
+import { GET_RACES } from '../../../backend/src/graphql/queries.ts';
 
-function useRace(race: string) {
-  const [data, setData] = useState<{
-    name: string;
-    alignment: string;
-    abilityBonuses: string[];
-    index: string;
-  }>({
-    name: '',
-    alignment: '',
-    abilityBonuses: [],
-    index: '',
+function useRaces(currentPage: number, racesPerPage: number) {
+  const offset = (currentPage - 1) * racesPerPage;
+
+  const { data, error, loading } = useQuery<{
+    races: { races: RaceProps[]; totalRaces: number };
+  }>(GET_RACES, {
+    variables: { offset, limit: racesPerPage },
+    fetchPolicy: 'network-only',
   });
 
-  useEffect(() => {
-    let isMounted = true;  // To avoid setting state on unmounted component
+  if (error) {
+    console.error('GraphQL Error:', error);
+  }
+  console.log('Data from server: ', data);
 
-    // Fetch data only if the race changes
-    if (race) {
-      fetch('https://www.dnd5eapi.co/api/races/' + race)
-        .then((response) => response.json())
-        .then((json) => {
-          if (isMounted) {
-            setData(json);
-          }
-        })
-        .catch((error) => console.log(error));
-    }
-
-    return () => {
-      isMounted = false;  // Cleanup function
-    };
-  }, [race]);
+  const transformedRaces = useMemo(() => {
+    if (!data || !data.races) return [];
+    return data.races.races.map((race) => ({
+      id: race.id,
+      index: race.index,
+      name: race.name,
+      speed: race.speed,
+      alignment: race.alignment,
+      size: race.size,
+    }));
+  }, [data]);
 
   return {
-    name: data.name,
-    alignment: data.alignment,
-    abilityBonuses: data.abilityBonuses,
-    index: data.index,
+    races: transformedRaces,
+    totalRaces: data?.races.totalRaces || 0,
+    loading,
+    error,
   };
 }
 
-export default useRace;
+export default useRaces;

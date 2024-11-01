@@ -11,7 +11,6 @@ import sorcerer from '../assets/images/class/sorcerer.png';
 import warlock from '../assets/images/class/warlock.png';
 import wizard from '../assets/images/class/wizard.png';
 
-// Mapping the class names to their respective images
 const classImageMapping: { [key: string]: string } = {
   barbarian,
   bard,

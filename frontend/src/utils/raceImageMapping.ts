@@ -8,7 +8,6 @@ import halfling from '../assets/images/race/halfling.png';
 import human from '../assets/images/race/human.png';
 import tiefling from '../assets/images/race/tiefling.png';
 
-// Mapping the race names to their respective images
 const imageMapping: { [key: string]: string } = {
   dragonborn,
   dwarf,

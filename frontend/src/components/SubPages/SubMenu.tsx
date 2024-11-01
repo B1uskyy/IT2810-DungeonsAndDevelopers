@@ -14,7 +14,7 @@ const SubMenu = () => {
       {/* Race Button */}
       <div
         className={`flex-1 transition-all duration-300 ease-in-out flex items-center justify-center ${
-          isActive('/project2/race') ? 'bold' : '' // Always keep bold for active
+          isActive('/project2/race') ? 'bold' : ''
         } ${hoveredButton === '/project2/race' || (!hoveredButton && isActive('/project2/race')) ? 'flex-grow-2' : ''}`}
         onMouseEnter={() => setHoveredButton('/project2/race')}
         onMouseLeave={() => setHoveredButton(null)}
@@ -23,7 +23,7 @@ const SubMenu = () => {
           text="Race"
           linkTo="/project2/race"
           noUnderline={true}
-          className="text-white text-2xl w-full justify-center"
+          className="header"
         />
       </div>
       <div className="h-14 w-0.5 bg-customRed"></div>
@@ -40,7 +40,7 @@ const SubMenu = () => {
           text="Class"
           linkTo="/project2/class"
           noUnderline={true}
-          className="text-white text-2xl w-full justify-center"
+          className="header w-full justify-center"
         />
       </div>
       <div className="h-14 w-0.5 bg-customRed"></div>
@@ -57,7 +57,7 @@ const SubMenu = () => {
           text="Ability scores"
           linkTo="/project2/abilityscore"
           noUnderline={true}
-          className="text-white text-2xl w-full justify-center"
+          className="header w-full justify-center"
         />
       </div>
     </section>

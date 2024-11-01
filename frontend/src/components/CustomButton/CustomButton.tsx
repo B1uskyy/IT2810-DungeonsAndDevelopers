@@ -14,8 +14,7 @@ interface ButtonProps {
 export default function CustomButton({
                                        text,
                                        onClick,
-                                       className = '',
-                                       textSize = 'text-3xl',
+                                       className = 'sub-header',
                                        linkTo,
                                        noUnderline = false,
                                        isActive = false,
@@ -42,7 +41,7 @@ export default function CustomButton({
   // If linkTo is provided, use Link component for navigation
   if (linkTo) {
     return (
-      <Link to={linkTo} className={`w-fit relative group flex ${textSize} ${activeClass} ${className}`}>
+      <Link to={linkTo} className={`w-fit relative group flex ${activeClass} ${className}`}>
         {buttonContent}
       </Link>
     );
@@ -50,7 +49,7 @@ export default function CustomButton({
 
   // Otherwise, render a regular button
   return (
-    <button className={`relative group flex ${textSize} ${activeClass} ${className}`} onClick={onClick}>
+    <button className={`relative group flex ${activeClass} ${className}`} onClick={onClick}>
       {buttonContent}
     </button>
   );

@@ -1,73 +1,197 @@
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { useState } from 'react';
+
 import MainPageLayout from '../../components/Layouts/MainPageLayout.tsx';
-import raceImageMapping from '../../utils/raceImageMapping.ts';
+
+import TutorialModal from '../../components/MyCharacter/TutorialModal.tsx';
+import useUserEquipments from '../../hooks/useUserEquipments.ts';
+import { useMutation, useQuery } from '@apollo/client';
+import {
+  GET_ARRAY_SCORES,
+  GET_USER_CLASS,
+  GET_USER_RACE,
+  UPDATE_ABILITY_SCORES,
+  UPDATE_USER_CLASS,
+  UPDATE_USER_RACE,
+} from '../../../../backend/src/graphql/queries.ts';
+import { useContext, useEffect, useState } from 'react';
+import { AuthContext } from '../../context/AuthContext.tsx';
+import useClasses from '../../hooks/useClasses.ts';
+import Counter from '../../components/Counter/Counter.tsx';
 import classImageMapping from '../../utils/classImageMapping.ts';
 import useRaces from '../../hooks/useRaces.ts';
-import useClasses from '../../hooks/useClasses.ts';
-import useAbilityScores from '../../hooks/useAbilityScores.ts';
-import Counter from '../../components/Counter/Counter.tsx';
+import raceImageMapping from '../../utils/raceImageMapping.ts';
+
+const abilityScoreMap: { [key: string]: number } = {
+  WIS: 5,
+  STR: 4,
+  INT: 3,
+  DEX: 2,
+  CON: 1,
+  CHA: 0,
+};
 
 const MyCharacterPage = () => {
-  const raceNames = ['dragonborn', 'dwarf', 'elf', 'gnome', 'half-elf', 'half-orc', 'halfling', 'human', 'tiefling'];
-  const classNames = ['barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard'];
+  const { userEquipments } = useUserEquipments();
+  const { userId } = useContext(AuthContext);
 
-  const raceData = raceNames.map(useRaces);
-  const classData = classNames.map(useClasses);
-
-  const [raceIndex, setRaceIndex] = useState(0);
+  // classes
+  const { data: userClassData } = useQuery(GET_USER_CLASS, {
+    variables: { userId },
+    skip: !userId,
+  });
+  const [updateUserClass] = useMutation(UPDATE_USER_CLASS);
+  const currentPage = 1;
+  const classesPerPage = 12;
+  const { classes: classData } = useClasses(currentPage, classesPerPage);
   const [classIndex, setClassIndex] = useState(0);
-
-  const [raceImageLoaded, setRaceImageLoaded] = useState(false);
   const [classImageLoaded, setClassImageLoaded] = useState(false);
 
-  const handleNextRace = () => setRaceIndex((prevIndex) => (prevIndex + 1) % raceData.length);
-  const handlePrevRace = () => setRaceIndex((prevIndex) => (prevIndex - 1 + raceData.length) % raceData.length);
+  //AbilityScore
+  const { data, loading } = useQuery(GET_ARRAY_SCORES, {
+    variables: { userId },
+  });
+  const [updateAbilityScores] = useMutation(UPDATE_ABILITY_SCORES);
+  const [scores, setScores] = useState<number[]>(Array(6).fill(0));
 
-  const handleNextClass = () => setClassIndex((prevIndex) => (prevIndex + 1) % classData.length);
-  const handlePrevClass = () => setClassIndex((prevIndex) => (prevIndex - 1 + classData.length) % classData.length);
+  const [selectedClassId, setSelectedClassId] = useState<string | undefined>(
+    userClassData?.user?.class?.id || (classData.length > 0 ? classData[0].id : undefined)
+  );
 
-  const currentRace = raceData[raceIndex];
-  const currentClass = classData[classIndex];
+  // races
 
-  const currentRaceImage = currentRace ? raceImageMapping[currentRace.index] : '';
-  const currentClassImage = currentClass ? classImageMapping[currentClass.index] : '';
+  const { data: userRaceData } = useQuery(GET_USER_RACE, {
+    variables: { userId },
+    skip: !userId,
+  });
+  const { races: raceData } = useRaces(currentPage, classesPerPage);
+  const [raceImageLoaded, setRaceImageLoaded] = useState(false);
+  const [raceIndex, setRaceIndex] = useState(0);
+  const [selectedRaceID, setSelectedRaceId] = useState<string | undefined>(
+    userRaceData?.user?.race?.id || (raceData.length > 0 ? raceData[0].id : undefined)
+  );
 
-  // Ability Score Logic
-  const abilities = ['cha', 'con', 'dex', 'int', 'str', 'wis'];
-  const abilityData = abilities.map(useAbilityScores);
-  const [abilityValue, setAbilityValue] = useState([0, 0, 0, 0, 0, 0]);
+  const [updateUserRace] = useMutation(UPDATE_USER_RACE);
 
-  const handleAbilityChange = (index: number, newValue: number) => {
-    const updatedAbilities = [...abilityValue];
-    updatedAbilities[index] = newValue;
-    setAbilityValue(updatedAbilities);
+  useEffect(() => {
+    if (data && data.getArrayScores) {
+      setScores(data.getArrayScores);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (userClassData?.user?.class?.id) {
+      setSelectedClassId(userClassData.user.class.id);
+      // Find and set the index of the selected class
+      const selectedIndex = classData.findIndex((c) => c.id === userClassData.user.class.id);
+      if (selectedIndex !== -1) {
+        setClassIndex(selectedIndex);
+      }
+    } else if (classData.length > 0) {
+      setSelectedClassId(classData[0].id);
+    }
+  }, [userClassData, classData]);
+  useEffect(() => {
+    if (userRaceData?.user?.race?.id) {
+      setSelectedRaceId(userRaceData.user.race.id);
+      // Find and set the index of the selected race
+      const selectedIndex = raceData.findIndex((c) => c.id === userRaceData.user.race.id);
+      if (selectedIndex !== -1) {
+        setRaceIndex(selectedIndex);
+      }
+    } else if (raceData.length > 0) {
+      setSelectedRaceId(raceData[0].id);
+    }
+  }, [userRaceData, raceData]);
+
+  const handleCounterChange = async (index: number, newValue: number) => {
+    const updatedScores = [...scores];
+    updatedScores[index] = newValue;
+    setScores(updatedScores);
+
+    try {
+      await updateAbilityScores({ variables: { userId, scores: updatedScores } });
+    } catch (error) {
+      console.error('Error updating ability scores:', error);
+    }
   };
 
+  const handleClassSelect = async () => {
+    const currentClass = classData[classIndex];
+    if (currentClass) {
+      try {
+        await updateUserClass({
+          variables: {
+            userId,
+            classId: currentClass.id,
+          },
+        });
+        setSelectedClassId(currentClass.id);
+      } catch (error) {
+        console.error('Error updating user class:', error);
+      }
+    }
+  };
+  const handleRaceSelect = async () => {
+    const currentRace = raceData[raceIndex];
+    if (currentRace) {
+      try {
+        await updateUserRace({
+          variables: {
+            userId,
+            raceId: currentRace.id,
+          },
+        });
+        setSelectedRaceId(currentRace.id);
+      } catch (error) {
+        console.error('Error updating race:', error);
+      }
+    }
+  };
+
+  const handleNextClass = () => {
+    const newIndex = (classIndex + 1) % classData.length;
+    setClassIndex(newIndex);
+  };
+
+  const handlePrevClass = () => {
+    const newIndex = (classIndex - 1 + classData.length) % classData.length;
+    setClassIndex(newIndex);
+  };
+
+  const handleNextRace = () => {
+    const newIndex = (raceIndex + 1) % raceData.length;
+    setRaceIndex(newIndex);
+  };
+  const handlePrevRace = () => {
+    const newIndex = (raceIndex - 1 + raceData.length) % raceData.length;
+    setRaceIndex(newIndex);
+  };
+
+  const currentClass = classData[classIndex];
+  const currentClassImage = currentClass ? classImageMapping[currentClass.index] : '';
+
+  const currentRace = raceData[raceIndex];
+  const currentRaceImage = currentRace ? raceImageMapping[currentRace.index] : '';
   return (
     <MainPageLayout>
-      <main
-        className="relative flex flex-col items-center justify-center min-h-screen w-full z-0 before:absolute before:inset-0 before:bg-myCharacter before:bg-cover before:bg-center before:z-0">
-
-        <div className="absolute inset-0 w-full h-full bg-black opacity-70" />
-        <div
-          className="flex flex-col py-20 text-white min-h-[calc(100vh-100px)] min-w-[70%] z-10 mt-24 justify-between items-center">
-          <h2 className="text-4xl">My Character</h2>
-          {/* RACE SECTION */}
-          <section className="w-full flex justify-between">
+      <main className="main before:bg-myCharacter">
+        <div className="black-overlay" />
+        <div className="wrapper w-full py-[15vh] gap-32">
+          <h1 className="header">My Character</h1>
+          <TutorialModal />
+          {/* Race section */}
+          <section className="w-full flex flex-col lg:flex-row justify-between">
             <article className="w-full xl:w-1/2 flex flex-col items-center">
-              <h2 className="text-3xl mb-8">Race:</h2>
-              <div className="flex items-center justify-between gap-4">
-                <button className="text-4xl text-white hover:text-gray-400" onClick={handlePrevRace}>
+              <h2 className="header">Race:</h2>
+              <div className="flex items-center">
+                <button className="arrow-button" onClick={handlePrevRace}>
                   <FaChevronLeft />
                 </button>
                 {currentRace && (
                   <article className="flex flex-col justify-center items-center gap-4 min-w-52">
-                    <h2 className="text-2xl">{currentRace.name}</h2>
-                    <div className="flex justify-center items-center w-52 h-52 overflow-hidden">
-                      {!raceImageLoaded && (
-                        <div className="flex justify-center w-full">Loading image...</div>
-                      )}
+                    {/*<h3 className="sub-header">{currentRace.name}</h3>*/}
+                    <div className="flex justify-center items-center w-[70vw] h-[30vh] lg:w-[20vw] lg:h-[25vh] overflow-hidden">
+                      {!raceImageLoaded && <div className="flex justify-center w-full">Loading image...</div>}
                       <img
                         src={currentRaceImage}
                         alt={currentRace.name}
@@ -78,72 +202,94 @@ const MyCharacterPage = () => {
                     </div>
                   </article>
                 )}
-                <button className="text-4xl text-white hover:text-gray-400" onClick={handleNextRace}>
+                <button className="arrow-button" onClick={handleNextRace}>
                   <FaChevronRight />
+                </button>
+                <button
+                  onClick={handleRaceSelect}
+                  className={`mt-4 px-6 py-2 rounded-md ${
+                    selectedRaceID === currentRace?.id
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-customRed-500 text-white hover:bg-customRed-600'
+                  }`}
+                  disabled={selectedRaceID === currentRace?.id}
+                >
+                  {selectedRaceID === currentRace?.id ? 'Current Race' : 'Select Race'}
                 </button>
               </div>
             </article>
 
             {/* Class section */}
-            <article className="w-full xl:w-1/2 flex flex-col items-center">
-              <h2 className="text-3xl mb-8">Class:</h2>
+            <article className="w-full xl:w-1/2 flex flex-col items-center mt-[10vh] lg:mt-0">
+              <h2 className="header">Class:</h2>
               <div className="flex items-center gap-4">
-                <button className="text-4xl text-white hover:text-gray-400" onClick={handlePrevClass}>
+                <button className="arrow-button" onClick={handlePrevClass}>
                   <FaChevronLeft />
                 </button>
                 {currentClass && (
                   <article className="flex flex-col items-center gap-4">
-                    <h2 className="text-2xl">{currentClass.name}</h2>
-                    <div className="flex justify-center items-center w-52 h-52 overflow-hidden">
-                      {!classImageLoaded && (
-                        <div className="flex justify-center w-full py-24">Loading image...</div>
-                      )}
+                    <h3 className="sub-header">{currentClass.name}</h3>
+                    <div className="flex justify-center items-center w-[65vw] h-[25vh] lg:w-[25vw] lg:h-[25vh] overflow-hidden">
+                      {!classImageLoaded && <div className="flex justify-center w-full py-24">Loading image...</div>}
                       <img
                         src={currentClassImage}
                         alt={currentClass.name}
                         className="w-full h-full object-contain shadow-none"
-                        onLoad={() => setClassImageLoaded(true)} // Update the state when image is loaded
-                        style={{ display: classImageLoaded ? 'block' : 'none' }} // Show image only when loaded
+                        onLoad={() => setClassImageLoaded(true)}
+                        style={{ display: classImageLoaded ? 'block' : 'none' }}
                       />
                     </div>
                   </article>
                 )}
-                <button className="text-4xl text-white hover:text-gray-400" onClick={handleNextClass}>
+                <button className="arrow-button" onClick={handleNextClass}>
                   <FaChevronRight />
+                </button>
+                <button
+                  onClick={handleClassSelect}
+                  className={`mt-4 px-6 py-2 rounded-md ${
+                    selectedClassId === currentClass?.id
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-customRed-500 text-white hover:bg-customRed-600'
+                  }`}
+                  disabled={selectedClassId === currentClass?.id}
+                >
+                  {selectedClassId === currentClass?.id ? 'Current Class' : 'Select Class'}
                 </button>
               </div>
             </article>
           </section>
-
           {/* Ability scores section */}
-          <section className="w-full flex xl:flex-row justify-between">
-            <article className="flex flex-col items-center w-full xl:w-1/2">
-              <h2 className="text-3xl mb-8">Ability Scores:</h2>
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-y-6 gap-x-40">
-                {abilityData.map((ability, index) => (
-                  <div key={index} className="flex items-center">
-                    <label className="text-lg w-32">{ability.full_name}:</label>
-                    <Counter
-                      value={abilityValue[index]}
-                      onChange={(newValue) => handleAbilityChange(index, newValue)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </article>
+          <article className="flex flex-col items-center w-full">
+            <h2 className="header mb-[8vh]">Ability Scores:</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-[12vh] gap-x-[25vw]">
+              {Object.keys(abilityScoreMap).map((key, index) => (
+                <div key={index} className="flex items-center">
+                  <label className="sub-header w-32 mr-[85px]">{key}:</label>
+                  <Counter
+                    scale={1.5}
+                    value={scores[abilityScoreMap[key]]}
+                    onChange={(newValue) => handleCounterChange(abilityScoreMap[key], newValue)}
+                  />
+                </div>
+              ))}
+            </div>
+          </article>
 
-            {/* Equipemnt section */}
-            <article className="flex flex-col items-center w-full xl:w-1/2">
-              <h2 className="text-3xl mb-8">Equipments:</h2>
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-y-10 gap-x-40">
-                {['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6', 'Item 7', 'Item 8', 'Item 9', 'Item 10'].map((item, index) => (
-                  <li key={index} className="list-disc list-inside text-lg">
-                    {item}
+          {/* Equipment section */}
+          <article className="flex flex-col items-center w-full mt-10">
+            <h2 className="header mb-[5vh]">Equipments:</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-[5vh] gap-x-[40vw] xl:gap-y-[10vh]">
+              {loading && <div>Loading equipments...</div>}
+              {userEquipments.length < 1 && <p>No equipments added yet...</p>}
+              <ul>
+                {userEquipments.map((equipment, index) => (
+                  <li key={index} className="list-disc list-inside sub-header">
+                    {equipment.name}
                   </li>
                 ))}
-              </div>
-            </article>
-          </section>
+              </ul>
+            </div>
+          </article>
         </div>
       </main>
     </MainPageLayout>

@@ -1,12 +1,25 @@
 import React from 'react';
 import Navbar from '../Navbar/Navbar.tsx';
 import SubMenu from '../SubPages/SubMenu.tsx';
+import { useLocation } from 'react-router-dom';
+import { useMediaQuery } from 'react-responsive';
 
 interface SubPageLayoutProps {
   children: React.ReactNode;
 }
 
 const SubPageLayout: React.FC<SubPageLayoutProps> = ({ children }) => {
+  const isLargeScreen = useMediaQuery({ query: '(min-width: 1024px)' });
+  const location = useLocation();
+
+  // Function to determine the header text based on the route
+  const getHeaderText = () => {
+    if (location.pathname.includes('/project2/race')) return 'Race';
+    if (location.pathname.includes('/project2/class')) return 'Class';
+    if (location.pathname.includes('/project2/abilityscore')) return 'Ability Scores';
+    return '';
+  };
+
   return (
     <>
       <Navbar />
@@ -20,7 +33,12 @@ const SubPageLayout: React.FC<SubPageLayoutProps> = ({ children }) => {
         </div>
 
         <section className="py-40 w-3/4 flex flex-col items-center gap-36">
-          <SubMenu />
+          {/* Conditionally render SubMenu or a header based on screen size */}
+          {isLargeScreen ? (
+            <SubMenu />
+          ) : (
+            <h1 className="header bold z-10">{getHeaderText()}</h1>
+          )}
           {children}
         </section>
       </main>

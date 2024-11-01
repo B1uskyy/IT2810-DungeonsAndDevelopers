@@ -2,19 +2,25 @@ import useAbilityScores from '../../hooks/useAbilityScores.ts';
 import AbilityScoreCard from '../../components/SubPages/AbilityScoreCard.tsx';
 import SubPageLayout from '../../components/Layouts/SubPageLayout.tsx';
 
+
 export default function AbilityScorePage() {
-  const abilities = ['cha', 'con', 'dex', 'int', 'str', 'wis'];
-  const abilityData = abilities.map(useAbilityScores);
+  const { loading, error, abilities } = useAbilityScores(1, 6);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error loading abilities.</div>;
+
 
   return (
     <SubPageLayout>
       <section className="flex flex-col items-center w-full gap-10">
-        {abilityData.map((ability, index) => (
+        {
+          abilities.map((ability) =>
+          (
           <AbilityScoreCard
-            key={index}
-            name={ability.full_name}
-            description={ability.desc}
-            skills={ability.skills.map((skill) => ({ name: skill.name }))}
+            key={ability.index}
+            name={ability.name}
+            index={ability.index}
+            skills={ability.skills}
           />
         ))}
       </section>

@@ -3,7 +3,7 @@ import AnimatedRoutes from './components/AnimatedRoutes/AnimatedRoutes.tsx';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/project2">
       <AnimatedRoutes />
     </BrowserRouter>
   );

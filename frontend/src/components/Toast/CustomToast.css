@@ -1,0 +1,16 @@
+.Toastify__toast-body {
+    font-family: "MedievalSharp", "sans-serif";
+}
+
+.Toastify__progress-bar--bg {
+    background-color: white !important;
+}
+
+.Toastify__progress-bar {
+    background-color: red !important;
+}
+
+.Toastify__close-button:hover svg {
+    fill: #DB3232;
+}
+

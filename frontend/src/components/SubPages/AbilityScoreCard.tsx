@@ -1,29 +1,53 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Counter from '../Counter/Counter.tsx';
+import AbilityScoreCardProps from '../../interfaces/AbilityScoreProps.ts';
+import { useMutation, useQuery } from '@apollo/client';
+import { GET_ARRAY_SCORES, UPDATE_ABILITY_SCORES } from '../../../../backend/src/graphql/queries.ts';
+import { AuthContext } from '../../context/AuthContext.tsx';
 
-interface Skill {
-  name: string;
-}
+const abilityScoreMap: { [key: string]: number } = {
+  WIS: 5,
+  STR: 4,
+  INT: 3,
+  DEX: 2,
+  CON: 1,
+  CHA: 0,
+};
+//Chatgpt prompt from line 17-24 and 26-30 and 34-43
+const AbilityScoreCard: React.FC<AbilityScoreCardProps> = ({ name, skills = [] }) => {
+  const [updateAbilityScores] = useMutation(UPDATE_ABILITY_SCORES);
+  const { userId } = useContext(AuthContext);
+  const { data, loading, error } = useQuery(GET_ARRAY_SCORES, {
+    variables: { userId },
+  });
+  const [scores, setScores] = useState<number[]>(data.abilityScores || Array(6).fill(0));
 
-interface AbilityScoreCardProps {
-  name: string;
-  description: string;
-  skills: Skill[];
-}
+  useEffect(() => {
+    if (data && data.getArrayScores) {
+      setScores(data.getArrayScores);
+    }
+  }, [data]);
 
-const AbilityScoreCard: React.FC<AbilityScoreCardProps> = ({ name, description, skills }) => {
-  // Add state to keep track of the ability score value
-  const [score, setScore] = useState<number>(0);
+  const index = abilityScoreMap[name.toUpperCase() as keyof typeof abilityScoreMap];
 
-  // Handle value changes for the counter
-  const handleCounterChange = (newValue: number) => {
-    setScore(newValue); // Update the score state
+  const handleCounterChange = async (newValue: number) => {
+    const updatedScores = [...scores];
+    updatedScores[index] = newValue;
+    setScores(updatedScores);
+    console.log(updatedScores);
+
+    try {
+      await updateAbilityScores({ variables: { userId, scores: updatedScores } });
+    } catch (error) {
+      console.error('Error updating ability scores:', error);
+    }
   };
-
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error loading ability scores.</div>;
   return (
     <motion.section
-      className="flex flex-row gap-10 h-60 w-full justify-between items-center p-12 rounded-lg bg-black bg-opacity-80"
+      className="flex flex-col xl:flex-row xl:h-[400px] 2xl:h-[350px] w-full justify-between items-center p-8 xl:p-12 rounded-lg bg-black bg-opacity-90 gap-10"
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.2 }}
@@ -34,25 +58,20 @@ const AbilityScoreCard: React.FC<AbilityScoreCardProps> = ({ name, description, 
       }}
     >
       {/* Display the ability name */}
-      <h2 className="text-3xl">{name}</h2>
+      <h2 className="sub-header">{name}</h2>
 
       {/* Counter component */}
-      <Counter value={score} onChange={handleCounterChange} />
+      <Counter value={scores[index]} onChange={handleCounterChange} scale={1.5} />
 
       {/* Display the ability description */}
-      <p className="text-lg">"{description}"</p>
+      {/* <p className="text"></p> */}
 
       {/* Display the skills associated with the ability */}
-      <ul className="text-white min-w-32">
-        <li className="bold text-lg">Skills:</li>
-        {skills.map((skill, index) => (
-          <li key={index}>{skill.name}</li>
-        ))}
+      <ul className="w-full justify-start xl:w-auto xl:justify-center xl:min-w-[15vw] 2xl:min-w-[10vw]">
+        <p className="text">Skills: {skills.join(', ')}</p>
       </ul>
     </motion.section>
   );
 };
 
 export default AbilityScoreCard;
-
-

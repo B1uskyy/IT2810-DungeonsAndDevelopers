@@ -35,8 +35,8 @@ export default function HomeSection({ title, text, image, reversed = false }: Se
           transition={{ duration: 1.2, ease: 'easeOut' }}
           variants={textVariants}
         >
-          <h2 className="sm:text-4xl text-3xl font-bold mb-4">{title}</h2>
-          <div className="text-md lg:leading-10 sm:text-xl leading-8">{text}</div>
+          <h2 className="header font-bold mb-4">{title}</h2>
+          <div className="text leading-10">{text}</div>
         </motion.div>
 
         {/* Image Slide-in Animation */}

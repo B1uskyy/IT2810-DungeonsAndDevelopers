@@ -15,6 +15,18 @@ export default {
       '6xl': '2560px',
     },
     extend: {
+      fontSize: {
+        'xs': '0.75vw',   // Extra small text, smallest
+        'sm': '0.875vw',  // Small text
+        'md': '1vw',    // Base font size
+        'lg': '1.25vw',   // Large text
+        'xl': '1.5vw',    // Extra large text
+        '2xl': '2vw',     // 2x Extra large text
+        '3xl': '2.5vw',   // 3x Extra large text
+        '4xl': '3.75vw',     // 4x Extra large text
+        '5xl': '5vw',
+        '6xl': '7vw', // 5x Extra large text, biggest
+      },
       colors: {
         customRed: '#DB3232',
         customGray: '#1E1E1E',
@@ -38,10 +50,16 @@ export default {
           '50%': { transform: 'scale(1.4)' },
           '100%': { transform: 'scale(1)' },
         },
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-5px)' },
+          '75%': { transform: 'translateX(5px)' },
+        },
       },
       animation: {
         'underline-expand': 'underlineExpand 0.3s ease-out forwards',
         'background-zoom': 'zoom 120s linear infinite',
+        'shake': 'shake 0.5s ease-in-out',
       },
       flexGrow: {
         '2': 2,

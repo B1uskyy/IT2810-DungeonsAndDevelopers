@@ -4,9 +4,10 @@ import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 interface CounterProps {
   value: number;
   onChange: (newValue: number) => void;
+  scale?: number;
 }
 
-export default function Counter({ value, onChange }: CounterProps) {
+export default function Counter({ value, onChange, scale }: CounterProps) {
   const changeTimer = useRef<NodeJS.Timeout | null>(null);
   const rate = 100;
 
@@ -52,7 +53,7 @@ export default function Counter({ value, onChange }: CounterProps) {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center" style={{ transform: `scale(${scale})` }}>
       <button
         className="text-white hover:text-gray-400"
         onMouseDown={startIncrement}
@@ -61,10 +62,11 @@ export default function Counter({ value, onChange }: CounterProps) {
         onTouchStart={startIncrement}
         onTouchEnd={clearTimer}
       >
-        <FaChevronUp size={24} />
+        <FaChevronUp size={22} />
       </button>
 
-      <div className="text-2xl text-white py-2 w-12 text-center">{value}</div>
+      <div
+        className="text-5xl md:text-4xl lg:text-3xl xl:text-2xl 2xl:text-lg text-white w-12 text-center">{value}</div>
 
       <button
         className="text-white hover:text-gray-400"
@@ -74,7 +76,7 @@ export default function Counter({ value, onChange }: CounterProps) {
         onTouchStart={startDecrement}
         onTouchEnd={clearTimer}
       >
-        <FaChevronDown size={24} />
+        <FaChevronDown size={22} />
       </button>
     </div>
   );

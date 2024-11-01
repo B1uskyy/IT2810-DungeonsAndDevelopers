@@ -1,78 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import { useQuery } from '@apollo/client';
+import { GET_CLASSES } from '../../../backend/src/graphql/queries.ts';
+import ClassData from '../interfaces/ClassProps.ts';
 
-interface ProficiencyOption {
-  item: {
-    index: string;
-    name: string;
-    url: string;
-  };
-}
+function useClass(currentPage: number, classesPerPage: number) {
+  const offset = (currentPage - 1) * classesPerPage;
 
-interface ProficiencyChoice {
-  desc: string;
-  choose: number;
-  type: string;
-  from: {
-    options: ProficiencyOption[];
-  };
-}
-
-interface ClassData {
-  name: string;
-  hit_die: number;
-  index: string;
-  skills: string[];
-}
-
-function useClasses(className: string) {
-  const [data, setData] = useState<ClassData>({
-    name: '',
-    hit_die: 0,
-    index: '',
-    skills: [],
+  const { data, error, loading } = useQuery<{
+    classes: { classes: ClassData[]; totalClasses: number };
+  }>(GET_CLASSES, {
+    variables: { offset, limit: classesPerPage },
+    fetchPolicy: 'network-only',
   });
 
-  useEffect(() => {
-    let isMounted = true;  // To avoid setting state on unmounted component
 
-    // Fetch data only if the className changes
-    if (className) {
-      fetch(`https://www.dnd5eapi.co/api/classes/${className}`)
-        .then((response) => response.json())
-        .then((json) => {
-          if (isMounted) {
-            const proficiencyChoices: ProficiencyChoice | undefined = json.proficiency_choices?.find(
-              (choice: ProficiencyChoice) => choice.type === 'proficiencies',
-            );
+  console.log('Data from server: ', data);
+  //console.log(data);
 
-            const skills = proficiencyChoices
-              ? proficiencyChoices.from.options.map((option: ProficiencyOption) =>
-                option.item.name.replace('Skill: ', ''),
-              )
-              : [];
-
-            setData({
-              name: json.name,
-              hit_die: json.hit_die,
-              index: json.index,
-              skills,
-            });
-          }
-        })
-        .catch((error) => console.log(error));
-    }
-
-    return () => {
-      isMounted = false;  // Cleanup function
-    };
-  }, [className]);
+  const transformedClasses = useMemo(() => {
+    if (!data || !data.classes) return [];
+    return data.classes.classes.map((classs) => ({
+      id: classs.id,
+      index: classs.index,
+      name: classs.name,
+      hit_die: classs.hit_die,
+      skills: classs.skills,
+    }));
+  }, [data]);
 
   return {
-    name: data.name,
-    hit_die: data.hit_die,
-    index: data.index,
-    skills: data.skills,
+    classes: transformedClasses,
+    totalClasses: data?.classes.totalClasses || 0,
+    loading,
+    error,
   };
 }
 
-export default useClasses;
+export default useClass;

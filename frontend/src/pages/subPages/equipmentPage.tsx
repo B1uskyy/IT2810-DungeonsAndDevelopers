@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import useEquipments from '../../hooks/useEquipments.ts';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useContext, useEffect, useState } from 'react';
 import MainPageLayout from '../../components/Layouts/MainPageLayout.tsx';
 import Pagination from '../../components/Pagination/Pagination.tsx';
+import EquipmentCard from '../../components/SubPages/EquipmentCard.tsx';
+import { AuthContext } from '../../context/AuthContext.tsx';
+import useEquipments from '../../hooks/useEquipments.ts';
+import { useToast } from '../../hooks/useToast.ts';
+import { Equipment } from '../../interfaces/EquipmentProps.ts';
+import useUserEquipments from '../../hooks/useUserEquipments.ts';
 
 const variants = {
   enter: (direction: number) => ({
-    x: direction > 0 ? 300 : -300, // Enter from left if next, right if previous
+    x: direction > 0 ? 300 : -300,
     opacity: 0,
   }),
   center: {
@@ -14,19 +19,68 @@ const variants = {
     opacity: 1,
   },
   exit: (direction: number) => ({
-    x: direction > 0 ? -300 : 300, // Exit to left if next, right if previous
+    x: direction > 0 ? -300 : 300,
     opacity: 0,
   }),
 };
 
-const EquipmentPage: React.FC = () => {
-  const results = useEquipments();
+const EquipmentPage = () => {
+  const { userId } = useContext(AuthContext);
+  const { showToast } = useToast();
+  const { userEquipments, loading, addToEquipments, removeFromEquipments } = useUserEquipments();
 
-  const itemsPerPage = 20;
-  const totalPages = Math.ceil(results.length / itemsPerPage);
+  const [direction, setDirection] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [direction, setDirection] = useState(1); // +1 for next, -1 for previous
+  const equipmentsPerPage = 20;
+  const maxEquipments = 10;
 
+  const { equipments: fetchedEquipments, totalEquipments: fetchedTotalEquipments } = useEquipments(
+    currentPage,
+    equipmentsPerPage
+  );
+
+  const [equipments, setEquipments] = useState<Equipment[]>(fetchedEquipments);
+
+  useEffect(() => {
+    setEquipments(fetchedEquipments);
+  }, [currentPage, fetchedEquipments]);
+
+  // chatgpt prompt line 111 to 145
+  const handleEquipmentChange = async (equipId: string, checked: boolean, equipment: Equipment) => {
+    try {
+      if (checked) {
+        // Check if user already has the maximum number of equipments
+        if (userEquipments.length >= maxEquipments) {
+          showToast({
+            message: 'Cannot add any more items, inventory is full',
+            type: 'warning',
+            duration: 2000,
+          });
+          return; // Early return to prevent adding the equipment
+        }
+
+        // Proceed to add equipment if within limits
+        await addToEquipments(equipId);
+        showToast({
+          message: `${equipment.name} was added to your equipments!`,
+          type: 'success',
+          duration: 3000,
+        });
+      } else {
+        // Handle equipment removal
+        await removeFromEquipments(equipId);
+        showToast({
+          message: `${equipment.name} was removed from your equipments!`,
+          type: 'success',
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating equipment:', error);
+    }
+  };
+
+  const totalPages = Math.ceil(fetchedTotalEquipments / equipmentsPerPage);
   const handlePageChange = (newDirection: number) => {
     const newPage = currentPage + newDirection;
     if (newPage >= 1 && newPage <= totalPages) {
@@ -35,27 +89,19 @@ const EquipmentPage: React.FC = () => {
     }
   };
 
-  const currentEquipment = results.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
-
+  if (loading) return <div>Loading...</div>;
 
   return (
     <MainPageLayout>
-      <main
-        className="relative flex flex-col items-center justify-center min-h-screen w-full z-0 before:absolute before:inset-0 before:bg-equipments before:bg-cover before:bg-center before:z-0">
-        <div className="absolute inset-0 w-full h-full bg-black opacity-70" />
-        <div
-          className="flex flex-col py-20 text-white min-h-[calc(100vh-100px)] min-w-[70%] z-10 mt-24 justify-between items-center">
-          <h1 className="text-4xl">Equipments</h1>
-
-          {/* Equipment Grid */}
+      <main className="main before:bg-equipments">
+        <div className="black-overlay" />
+        <div className="wrapper py-20 min-w-[70%] flex gap-y-32 2xl:gap-0 mt-10 items-center justify-center">
+          <h1 className="header">Equipments</h1>
           <section className="w-full h-9/10 overflow-hidden">
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
                 key={currentPage}
-                className="grid grid-cols-4 gap-x-20 gap-y-16 w-full"
+                className="grid xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 3xl:grid-cols-5 gap-6 p-4"
                 custom={direction}
                 variants={variants}
                 initial="enter"
@@ -63,22 +109,22 @@ const EquipmentPage: React.FC = () => {
                 exit="exit"
                 transition={{ duration: 0.3 }}
               >
-                {currentEquipment.map((equip, index) => (
-                  <div key={index} className="flex items-center">
-                    <input type="checkbox" className="mr-4 cursor-pointer min-w-8 min-h-8 accent-customRed" />
-                    <span className="text-xl">{equip.name}</span>
-                  </div>
-                ))}
+                {equipments.map((equipment, index) => {
+                  return (
+                    <EquipmentCard
+                      key={index}
+                      equipment={equipment}
+                      isChecked={userEquipments.some((userEquip) => userEquip.id === equipment.id)}
+                      userId={userId}
+                      onChange={handleEquipmentChange}
+                      disabled={userEquipments.length >= maxEquipments}
+                    />
+                  );
+                })}
               </motion.div>
             </AnimatePresence>
           </section>
-
-          {/* Pagination Controls */}
-          <Pagination
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-            totalPages={totalPages}
-          />
+          <Pagination currentPage={currentPage} onPageChange={handlePageChange} totalPages={totalPages} />
         </div>
       </main>
     </MainPageLayout>

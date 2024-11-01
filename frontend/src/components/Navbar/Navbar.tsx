@@ -4,7 +4,7 @@ import { FiMenu, FiX } from 'react-icons/fi';
 import { FaChevronDown } from 'react-icons/fa';
 import logo from '../../assets/images/logo.svg';
 import CustomButton from '../CustomButton/CustomButton.tsx';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +13,7 @@ const Navbar = () => {
   const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
   const [isDropdownHovered, setIsDropdownHovered] = useState(false);
 
+  const navigate = useNavigate();
   const location = useLocation();
 
   const toggleMenu = () => {
@@ -21,6 +22,11 @@ const Navbar = () => {
 
   const toggleMobileDropdown = () => {
     setIsMobileDropdownOpen(!isMobileDropdownOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/project2');
   };
 
   useEffect(() => {
@@ -48,6 +54,11 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleScroll = () => {
+      const isHamburgerMenu = window.innerWidth < 1024;
+      if (isHamburgerMenu) {
+        setShowNavbar(true);
+        return;
+      }
       const currentScrollY = window.scrollY;
       const maxScrollY = document.documentElement.scrollHeight - window.innerHeight;
 
@@ -93,7 +104,7 @@ const Navbar = () => {
           <div className="flex items-center mr-6 xl:hidden">
             <button
               onClick={toggleMenu}
-              className="text-4xl "
+              className="text-[2rem]"
               aria-expanded={isOpen ? 'true' : 'false'}
               aria-label={isOpen ? 'Close menu' : 'Open menu'}
             >
@@ -104,11 +115,12 @@ const Navbar = () => {
           {/* Menu for large screens */}
           <div className="hidden xl:flex justify-between items-center w-11/12">
             <Link to={'/project2/home'}>
-              <img src={logo} alt="Dungeons & Developers logo" className="w-16 xl:block hidden shadow-none" />
+              <img src={logo} alt="Dungeons & Developers logo" className="w-[3vw] xl:block hidden shadow-none" />
             </Link>
-            <section className="flex justify-between 4xl:w-3/5 w-4/5">
+            <section className="flex justify-between 4xl:w-3/5 w-3/5 ">
               <CustomButton text={'Monsters'} linkTo={'/project2/monsters'}
-                            isActive={location.pathname === '/project2/monsters'} />
+                            isActive={location.pathname === '/project2/monsters'}
+                            className="sub-header" />
               <CustomButton text={'Dungeon'} linkTo={'/project2/dungeon'}
                             isActive={location.pathname === '/project2/dungeon'} />
 
@@ -120,7 +132,7 @@ const Navbar = () => {
                 <CustomButton
                   text={'My character'}
                   linkTo={'/project2/mycharacter'}
-                  className={`flex items-center space-x-3`}
+                  className={`flex items-center space-x-3 sub-header`}
                   isActive={location.pathname.startsWith('/project2/mycharacter')}
                 >
                   <FaChevronDown
@@ -132,7 +144,7 @@ const Navbar = () => {
 
                 {/* Dropdown menu */}
                 <div
-                  className={`absolute left-1/2 transform -translate-x-1/2 w-72 bg-customRed rounded overflow-hidden duration-300 ease-in-out max-h-0 ${
+                  className={`absolute left-1/2 transform -translate-x-1/2 w-[18vw] bg-customRed rounded overflow-hidden duration-300 ease-in-out max-h-0 ${
                     isDropdownHovered ? 'max-h-96 opacity-100' : 'opacity-0'
                   }`}
                 >
@@ -157,7 +169,7 @@ const Navbar = () => {
                 </div>
               </div>
 
-              <CustomButton text={'Log out'} linkTo={'/project2'} isActive={location.pathname === '/project2'}>
+              <CustomButton text={'Log out'} onClick={handleLogout}>
                 <IoIosLogOut className="ml-2 mt-0.5" />
               </CustomButton>
             </section>
@@ -167,26 +179,26 @@ const Navbar = () => {
 
       {/* Slide-in Menu for small screens */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-customRed text-white transition-transform transform ${
+        className={`fixed top-0 right-0 h-full max-w-full w-64 sm:w-72 bg-customRed text-white transition-transform transform ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         } xl:hidden pl-4 pt-10 z-50`}
       >
-        <button onClick={toggleMenu} className="absolute top-4 right-10 text-4xl">
+        <button onClick={toggleMenu} className="absolute top-4 right-10 text-[2rem]">
           <FiX />
         </button>
         <ul className="mt-16 space-y-10">
           <li>
-            <CustomButton text={'Monsters'} linkTo={'/project2/monsters'} className="text-xl" noUnderline={true}
+            <CustomButton text={'Monsters'} linkTo={'/project2/monsters'} className="sub-header" noUnderline={true}
                           isActive={location.pathname === '/project2/monsters'} />
           </li>
           <li>
-            <CustomButton text={'Dungeon'} linkTo={'/project2/dungeon'} className="text-xl" noUnderline={true}
+            <CustomButton text={'Dungeon'} linkTo={'/project2/dungeon'} className="sub-header" noUnderline={true}
                           isActive={location.pathname === '/project2/dungeon'} />
           </li>
           <li>
             <div className="space-y-2">
               <div className="flex">
-                <CustomButton text={'My character'} linkTo={'/project2/mycharacter'} className="text-xl"
+                <CustomButton text={'My character'} linkTo={'/project2/mycharacter'} className="sub-header"
                               noUnderline={true}
                               isActive={location.pathname.startsWith('/project2/mycharacter')} />
                 <FaChevronDown
@@ -199,27 +211,27 @@ const Navbar = () => {
 
               <div
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  isMobileDropdownOpen ? 'max-h-52 opacity-100' : 'max-h-0 opacity-0'
+                  isMobileDropdownOpen ? 'max-h-[60vw] opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
                 <ul className="space-y-2 pl-4">
                   <li>
-                    <CustomButton text={'Races'} linkTo={'/project2/race'} className="px-4 py-2 text-xl"
+                    <CustomButton text={'Race'} linkTo={'/project2/race'} className="px-4 py-2 sub-header"
                                   noUnderline={true}
                                   isActive={location.pathname === '/project2/race'} />
                   </li>
                   <li>
-                    <CustomButton text={'Classes'} linkTo={'/project2/class'} className="px-4 py-2 text-xl"
+                    <CustomButton text={'Class'} linkTo={'/project2/class'} className="px-4 py-2 sub-header"
                                   noUnderline={true}
                                   isActive={location.pathname === '/project2/class'} />
                   </li>
                   <li>
                     <CustomButton text={'Ability Scores'} linkTo={'/project2/abilityscore'}
-                                  className="px-4 py-2 text-xl"
+                                  className="px-4 py-2 sub-header"
                                   noUnderline={true} isActive={location.pathname === '/project2/abilityscore'} />
                   </li>
                   <li>
-                    <CustomButton text={'Equipments'} linkTo={'/project2/equipment'} className="px-4 py-2 text-xl"
+                    <CustomButton text={'Equipments'} linkTo={'/project2/equipment'} className="px-4 py-2 sub-header"
                                   noUnderline={true} isActive={location.pathname === '/project2/equipment'} />
                   </li>
                 </ul>
@@ -228,8 +240,8 @@ const Navbar = () => {
           </li>
 
           <li>
-            <CustomButton text={'Log out'} linkTo={'/project2'} className="text-xl flex items-center"
-                          isActive={location.pathname === '/project2'}>
+            <CustomButton text={'Log out'} linkTo={'/project2'} className="sub-header flex items-center"
+                          noUnderline={true} isActive={location.pathname === '/project2'}>
               <IoIosLogOut className="ml-2" />
             </CustomButton>
           </li>
