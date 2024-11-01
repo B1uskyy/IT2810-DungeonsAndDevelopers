@@ -28,7 +28,7 @@ export default function AnimatedRoutes() {
 
         {/* Protected Routes */}
         <Route
-          path="project2/home"
+          path="/project2/home"
           element={
             <ProtectedRoute>
               <HomePage />
