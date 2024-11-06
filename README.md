@@ -6,6 +6,7 @@
 
 An application to explore the various functionalities and mechanics of the popular roleplaying game Dungeons & Dragons. Where you can create your own character, explore the games classes, monsters, races and abilityscores!
 
+Link to VM page: http://it2810-20.idi.ntnu.no/project2/
 
 ## Features
 
