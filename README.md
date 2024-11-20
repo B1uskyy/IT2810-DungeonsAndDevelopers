@@ -38,18 +38,20 @@ An application to explore the various functionalities and mechanics of the popul
 
 ## Features
 
-#### Explore monsters
+####  Monsters
 - You can explore the different monsters within D&D
     - View the monsters HP, and type
-    - Filter by type search for specific monsters
+    - Filter by type/health search for specific monsters and sort them 
     - Review monsters to assign them difficulties and notes
     - Add monsters to your dungeon
 
 #### Dungeon
-- View all saved monsters, and their combined HP. To know how difficult this dungeon would be
+- View all saved monsters, and their combined HP. To know how difficult this dungeon would be.
+- Rename your dungeon to make it personal
 
 #### My character
-- Explore the different races, classes, ability scores and equipment which you can assign to your character. With usefull information
+- Explore the different races, classes, ability scores and equipments which you can assign to your character. 
+With usefull information to help you make the right choice!
 
 
 
