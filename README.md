@@ -134,7 +134,7 @@ For E2E testing we have used Cypress to simulate different user stories. We have
 - **Login.cy**: Tests login, searching, and user interaction with data
 - **Filtering.cy**: tests login and filtering. 
 
-To run the E2E tests you need to be in the frontend folder and run: 
+To run the E2E tests you need to be in the frontend folder, with the frontend and backend running, and run: 
 
 ```bash
   npx cypress open   
