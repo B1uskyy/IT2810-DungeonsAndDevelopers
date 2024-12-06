@@ -12,6 +12,7 @@ app.use(express.json());
 
 /**
  * Setup of mongodb connection with GraphQL, starts backend server.
+ *
  */
 
 app.use(

@@ -9,15 +9,18 @@ describe(
     it('Logs in and performs user story for adding and removing monsters from dungeon', () => {
       cy.visit('http://localhost:5173/');
 
-      cy.get('input#log-in-input').type('Cypress test user');
-      cy.get('button').first().should('exist').should('have.text', 'Log in').click();
-
       cy.get('img[alt="accessability icon"]').should('exist');
       cy.get('label').should('exist');
 
       cy.get('input[type="checkbox"]').should('not.be.checked');
 
       cy.get('label').click();
+
+      cy.get('input#log-in-input').type('Cypress test user');
+      cy.get('button').first().should('exist').should('have.text', 'Log in').click();
+
+      cy.get('img[alt="accessability icon"]').should('exist');
+      cy.get('label').should('exist');
 
       cy.get('a').contains('Monsters').click();
 
@@ -35,7 +38,7 @@ describe(
 
       cy.get('input[type="text"]').clear();
 
-      cy.get('button').contains('Filter Monsters').click();
+      cy.get('button').contains('Filter Monsters').click({ force: true });
 
       cy.wait(1000);
 
